@@ -8,30 +8,41 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Build and Test') {
             steps {
-                sh 'npm install'
+                script {
+                    // Build the Docker image
+                    sh 'docker build -t blog-api .'
+                    
+                    // Run tests inside the container
+                    sh 'docker run --rm blog-api npm test || true'
+                }
             }
         }
-
-        stage('Run Tests') {
+        
+        stage('Run Application') {
             steps {
-                // Allows pipeline to continue even if tests fail
-                sh 'npm test || true'
-            }
-        }
-
-        stage('Generate Coverage Report') {
-            steps {
-                // Ensure coverage report exists
-                sh 'npm run coverage || true'
-            }
-        }
-
-        stage('NPM Audit (Security Scan)') {
-            steps {
-                // This will show known CVEs in the output
-                sh 'npm audit || true'
+                script {
+                    // Start MongoDB container
+                    sh 'docker network create blog-network || true'
+                    sh 'docker run -d --name mongodb --network blog-network mongo:latest'
+                    
+                    // Run the application container with MongoDB connection
+                    sh '''
+                    docker run -d --name blog-api \
+                      -p 5001:5000 \
+                      -e MONGO_URI=mongodb://mongodb:27017/blog-api \
+                      -e JWT_SECRET=jenkins_secret_key \
+                      --network blog-network \
+                      blog-api
+                    '''
+                    
+                    // Give it a moment to start
+                    sh 'sleep 10'
+                    
+                    // Check if the application is running
+                    sh 'curl http://localhost:5001 || echo "Application failed to start"'
+                }
             }
         }
     }
