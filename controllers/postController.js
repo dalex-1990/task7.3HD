@@ -12,9 +12,6 @@ exports.createPost = async (req, res) => {
   }
 
   try {
-    // Get user without password
-    const user = await User.findById(req.user.id).select('-password');
-
     // Create new post
     const newPost = new Post({
       title: req.body.title,
