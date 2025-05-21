@@ -12,7 +12,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_default_secret';
 console.log('Environment variables:');
 console.log('PORT:', PORT);
 console.log('MONGO_URI:', MONGO_URI);
-console.log('JWT_SECRET:', JWT_SECRET ? 'your_default_secret' : 'Not set');  // Don't log the actual secret
+console.log('JWT_SECRET:', JWT_SECRET ? '******' : 'Not set');  // Don't log the actual secret
 
 // Middleware
 app.use(express.json());
@@ -21,6 +21,10 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.send('Blog API is running');
 });
+
+// Register API Routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/posts', require('./routes/posts'));
 
 // Connect to MongoDB with error handling
 mongoose.connect(MONGO_URI, {
