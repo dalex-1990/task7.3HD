@@ -49,25 +49,19 @@ pipeline {
                     // Capture logs for debugging
                     sh 'sleep 5'
                     sh 'docker logs blog-api || echo "No logs available"'
-                    
-                    // Give it more time to start
-                    sh 'sleep 10'
-                    
-                    // Check if the application is running
-                    sh 'curl http://localhost:5001 || echo "Application failed to start"'
                 }
             }
         }
     }
     
-    post {
-        always {
-            // Cleanup
-            sh 'docker stop blog-api || true'
-            sh 'docker rm blog-api || true'
-            sh 'docker stop mongodb || true'
-            sh 'docker rm mongodb || true'
-            sh 'docker network rm blog-network || true'
-        }
-    }
+    // post {
+    //     always {
+    //         // Cleanup
+    //         sh 'docker stop blog-api || true'
+    //         sh 'docker rm blog-api || true'
+    //         sh 'docker stop mongodb || true'
+    //         sh 'docker rm mongodb || true'
+    //         sh 'docker network rm blog-network || true'
+    //     }
+    // }
 }
