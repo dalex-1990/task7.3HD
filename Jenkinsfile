@@ -16,7 +16,7 @@ pipeline {
                     sh 'docker build -t blog-api .'
                     
                     // Run tests inside the container
-                    sh 'docker run --rm blog-api npm test || true'
+                    sh 'docker run --rm blog-api npm test'
                 }
             }
         }
