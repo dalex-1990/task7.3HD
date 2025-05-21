@@ -61,10 +61,17 @@ pipeline {
         }
     }
     post {
-        always {
-            //Add channel name
+        success {
+            echo 'Build succeeded'
+            // slackSend, curl to webhook, or emailext
+        }
+        failure {
+             //Add channel name
             slackSend channel: '#all-deakin',
             message: "Find Status of Pipeline:- ${currentBuild.currentResult} ${env.JOB_NAME} ${env.BUILD_NUMBER} ${BUILD_URL}"
+        }
+        always {
+           
         }
     }
     // post {
