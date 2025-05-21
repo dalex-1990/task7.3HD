@@ -11,18 +11,11 @@ pipeline {
         stage('Build and Test') {
             steps {
                 script {
-                    // Clean up any previous containers that might exist
-                    sh 'docker stop blog-api || true'
-                    sh 'docker rm blog-api || true'
-                    sh 'docker stop mongodb || true'
-                    sh 'docker rm mongodb || true'
-                    
                     // Build the Docker image
-                    sh 'docker build -t blog-api:${BUILD_NUMBER} .'
-                    sh 'docker tag blog-api:${BUILD_NUMBER} blog-api:latest'
+                    sh 'docker build -t blog-api .'
                     
                     // Run tests inside the container
-                    sh 'docker run --rm blog-api:${BUILD_NUMBER} npm test || true'
+                    sh 'docker run --rm blog-api npm test || true'
                 }
             }
         }
@@ -30,7 +23,13 @@ pipeline {
         stage('Run Application') {
             steps {
                 script {
-                    // Ensure network exists
+                    // Clean up any existing containers
+                    sh 'docker stop blog-api || true'
+                    sh 'docker rm blog-api || true'
+                    sh 'docker stop mongodb || true'
+                    sh 'docker rm mongodb || true'
+                    
+                    // Create network if it doesn't exist
                     sh 'docker network create blog-network || true'
                     
                     // Start MongoDB container
@@ -43,7 +42,7 @@ pipeline {
                       -e MONGO_URI=mongodb://mongodb:27017/blog-api \
                       -e JWT_SECRET=jenkins_secret_key \
                       --network blog-network \
-                      blog-api:${BUILD_NUMBER}
+                      blog-api
                     '''
                     
                     // Give it a moment to start
@@ -58,24 +57,12 @@ pipeline {
     
     post {
         always {
-            // Clean up after build is complete
-            script {
-                sh 'docker stop blog-api || true'
-                sh 'docker rm blog-api || true'
-                sh 'docker stop mongodb || true'
-                sh 'docker rm mongodb || true'
-                sh 'docker network rm blog-network || true'
-                
-                // Keep only recent Docker images to prevent disk space issues
-                sh '''
-                # Keep only the 5 most recent blog-api images
-                KEEP=5
-                COUNT=$(docker images blog-api --format "{{.ID}}" | wc -l)
-                if [ $COUNT -gt $KEEP ]; then
-                    docker images blog-api --format "{{.ID}} {{.Tag}}" | grep -v latest | sort | head -n -$KEEP | awk '{print $1}' | xargs -r docker rmi
-                fi
-                '''
-            }
+            // Cleanup
+            sh 'docker stop blog-api || true'
+            sh 'docker rm blog-api || true'
+            sh 'docker stop mongodb || true'
+            sh 'docker rm mongodb || true'
+            sh 'docker network rm blog-network || true'
         }
     }
 }
