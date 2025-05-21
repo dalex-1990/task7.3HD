@@ -1,6 +1,9 @@
 pipeline {
     agent any
-
+    environment {
+        NODE_ENV = 'production'
+        API_KEY = credentials('SONAR_TOKEN') // from Jenkins credentials store
+    }
     stages {
         stage('Checkout') {
             steps {
@@ -20,7 +23,21 @@ pipeline {
                 }
             }
         }
-        
+        stage('SonarCloud Analysis') {
+            steps {
+                 withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
+                    sh '''
+                        # Run SonarScanner in a Docker container
+                        docker run --rm \
+                          -e SONAR_HOST_URL="https://sonarcloud.io" \
+                          -e SONAR_TOKEN="${SONAR_TOKEN}" \
+                          -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=dalex-1990_task7.3HD -Dsonar.organization=dalex-1990" \
+                          -v "$(pwd):/usr/src" \
+                          sonarsource/sonar-scanner-cli:latest
+                    '''
+                }
+            }
+        }
         stage('Run Application') {
             steps {
                 script {
