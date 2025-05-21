@@ -11,6 +11,7 @@ pipeline {
         stage('Build and Test') {
             steps {
                 script {
+                    sh 'npm install --save-dev jest supertest'
                     // Build the Docker image
                     sh 'docker build -t blog-api .'
                     
