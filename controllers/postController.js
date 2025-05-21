@@ -18,10 +18,7 @@ exports.createPost = async (req, res) => {
     // Create new post
     const newPost = new Post({
       title: req.body.title,
-      content: req.body.content,
-      image: req.body.image,
-      tags: req.body.tags,
-      user: req.user.id
+      content: req.body.content
     });
 
     // Save post
