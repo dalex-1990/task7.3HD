@@ -28,7 +28,7 @@ pipeline {
                     sh 'docker rm blog-api || true'
                     sh 'docker stop mongodb || true'
                     sh 'docker rm mongodb || true'
-                    
+                    sh 'docker network rm blog-network || true'
                     // Create network if it doesn't exist
                     sh 'docker network create blog-network || true'
                     
