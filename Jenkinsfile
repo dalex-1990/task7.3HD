@@ -34,18 +34,23 @@ pipeline {
                     
                     // Start MongoDB container
                     sh 'docker run -d --name mongodb --network blog-network mongo:latest'
+                    sh 'sleep 5'  // Give MongoDB a moment to initialize
                     
-                    // Run the application container with MongoDB connection
+                    // Run the application container with MongoDB connection and explicit start command
                     sh '''
                     docker run -d --name blog-api \
                       -p 5001:5000 \
                       -e MONGO_URI=mongodb://mongodb:27017/blog-api \
                       -e JWT_SECRET=jenkins_secret_key \
                       --network blog-network \
-                      blog-api
+                      blog-api node server.js
                     '''
                     
-                    // Give it a moment to start
+                    // Capture logs for debugging
+                    sh 'sleep 5'
+                    sh 'docker logs blog-api || echo "No logs available"'
+                    
+                    // Give it more time to start
                     sh 'sleep 10'
                     
                     // Check if the application is running
