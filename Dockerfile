@@ -9,6 +9,9 @@ COPY package*.json ./
 
 RUN npm install
 
+# Copy New Relic config (if you have it)
+COPY newrelic.js ./
+
 # Bundle app source
 COPY . .
 
