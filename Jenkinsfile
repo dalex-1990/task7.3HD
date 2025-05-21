@@ -15,6 +15,18 @@ pipeline {
                 sh 'npm install newrelic --save'
             }
         }
+        stage('Security Check') {
+            steps {
+                script {
+                    sh 'npm install --package-lock-only' // make sure lock file is fresh
+                    // Run npm audit
+                    sh '''
+                        echo "Running npm audit for vulnerability scanning..."
+                        npm audit --audit-level=high || echo "Security vulnerabilities found!"
+                    '''
+                }
+            }
+        }
         stage('Build and Test') {
             steps {
                 script {
