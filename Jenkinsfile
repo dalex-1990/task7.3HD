@@ -23,6 +23,13 @@ pipeline {
                 }
             }
         }
+
+        stage('Install New Relic Agent') {
+            steps {
+                sh 'npm install newrelic --save'
+            }
+        }
+        
         stage('Build and Test') {
             steps {
                 script {
@@ -50,11 +57,7 @@ pipeline {
                 }
             }
         }
-        stage('Install New Relic Agent') {
-            steps {
-                sh 'npm install newrelic --save'
-            }
-        }
+      
         stage('Run Application') {
             steps {
                 script {
