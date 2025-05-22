@@ -10,11 +10,7 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/dalex-1990/task7.3HD.git'
             }
         }
-        stage('Install New Relic Agent') {
-            steps {
-                sh 'npm install newrelic --save'
-            }
-        }
+        
         stage('Security Check') {
             steps {
                 script {
@@ -92,6 +88,7 @@ pipeline {
                 }
             }
         }
+
     }
     post {
         success {
@@ -115,6 +112,12 @@ pipeline {
     //         sh 'docker stop mongodb || true'
     //         sh 'docker rm mongodb || true'
     //         sh 'docker network rm blog-network || true'
+    //     }
+    // }
+    
+    // stage('Install New Relic Agent') {
+    //     steps {
+    //         sh 'npm install newrelic --save'
     //     }
     // }
 }
