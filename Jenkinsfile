@@ -50,6 +50,11 @@ pipeline {
                 }
             }
         }
+        stage('Install New Relic Agent') {
+            steps {
+                sh 'npm install newrelic --save'
+            }
+        }
         stage('Run Application') {
             steps {
                 script {
@@ -112,12 +117,6 @@ pipeline {
     //         sh 'docker stop mongodb || true'
     //         sh 'docker rm mongodb || true'
     //         sh 'docker network rm blog-network || true'
-    //     }
-    // }
-    
-    // stage('Install New Relic Agent') {
-    //     steps {
-    //         sh 'npm install newrelic --save'
     //     }
     // }
 }
